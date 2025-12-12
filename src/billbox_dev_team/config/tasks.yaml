@@ -1,0 +1,88 @@
+tasks:
+  spec_task:
+    description: >
+      Produire /docs/SPECS.md (FR) avec:
+      - MVP BillBox V1 (scope strict)
+      - user stories + critères d’acceptation
+      - endpoints attendus
+      - écrans web + mobile
+      - règles de sécurité minimales (JWT, hashing, CORS, env vars)
+    expected_output: "Un fichier /docs/SPECS.md complet."
+    agent: pm_agent
+
+  plan_task:
+    description: >
+      Produire /docs/PLAN.md:
+      - structure monorepo /backend /web /mobile
+      - plan d’implémentation en tickets
+      - conventions code
+      - commandes de run/test
+      Puis créer les dossiers vides si absents.
+    expected_output: "Un fichier /docs/PLAN.md + arborescence projet créée."
+    agent: tech_lead_agent
+    context: [spec_task]
+
+  implement_backend_task:
+    description: >
+      Implémenter /backend en FastAPI:
+      - Auth: register/login (JWT)
+      - Models: users, invoices, business_accounts, payment_requests
+      - SQLite dev (billbox.db) + config Postgres via env pour prod
+      - Tests pytest basiques
+      - README backend + start.sh
+    expected_output: "Backend fonctionnel sur http://localhost:8000/docs + tests OK."
+    agent: backend_dev_agent
+    context: [plan_task]
+
+  implement_web_task:
+    description: >
+      Créer /web (Next.js) connecté au backend:
+      - pages: login/register, dashboard, invoices list, invoice detail, create invoice
+      - client API + gestion token
+      - UI simple (shadcn ou équivalent), validation formulaires
+      - .env.example (NEXT_PUBLIC_API_URL)
+      - scripts: dev/build/lint
+    expected_output: "Web app lançable et connectée au backend."
+    agent: frontend_dev_agent
+    context: [implement_backend_task]
+
+  implement_mobile_task:
+    description: >
+      Créer /mobile (Expo RN):
+      - navigation: auth -> dashboard -> invoices list -> detail -> pay
+      - QR scan (expo-barcode-scanner)
+      - API client + token storage
+      - .env.example
+    expected_output: "Expo app lançable, connectée au backend."
+    agent: mobile_dev_agent
+    context: [implement_backend_task]
+
+  test_task:
+    description: >
+      Lancer toutes les vérifications:
+      - backend: pytest
+      - web: build/lint
+      - mobile: expo doctor (si possible) / typecheck si ajouté
+      Corriger si nécessaire jusqu’à succès.
+    expected_output: "Tous les tests/builds passent."
+    agent: qa_release_agent
+    context: [implement_web_task, implement_mobile_task]
+
+  commit_push_task:
+    description: >
+      Vérifier git status, créer un commit propre:
+      message: "BillBox V1: backend+web+mobile scaffold"
+      Puis push sur origin main si possible.
+    expected_output: "Commit créé et push effectué (si remote configuré)."
+    agent: qa_release_agent
+    context: [test_task]
+
+  deploy_task:
+    description: >
+      Déployer si tokens dispo:
+      - backend sur Railway
+      - web sur Vercel
+      Sinon: produire /docs/DEPLOY.md avec les commandes exactes.
+    expected_output: "Déploiement effectué ou /docs/DEPLOY.md généré."
+    agent: qa_release_agent
+    context: [commit_push_task]

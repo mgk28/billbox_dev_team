@@ -1,0 +1,43 @@
+define_architecture:
+  description: >
+    Proposer une architecture technique complète pour BillBox V1, incluant :
+    - Backend (langage, framework, structure des dossiers, models principaux)
+    - Base de données (tables users, invoices, business_accounts, payment_requests)
+    - Application mobile (framework recommandé, structure des écrans)
+    - Intégration des factures (email + scan QR)
+    - Redirection vers les apps de paiement (deeplinks / QR)
+    Le tout doit être simple à maintenir et adapté à une fondatrice non technique
+    qui sera aidée par des IA développeurs.
+  expected_output: >
+    Un plan détaillé d'architecture (texte structuré) avec :
+    - choix techniques justifiés
+    - schéma des tables
+    - liste des endpoints principaux
+    - liste des écrans mobiles
+    - étapes de mise en place recommandées.
+  agent: architect_agent
+
+design_backend_models:
+  description: >
+    À partir du plan d'architecture proposé, concevoir précisément les modèles backend
+    pour BillBox : users, invoices, business_accounts, payment_requests.
+    Proposer la structure de code (par exemple en FastAPI) et les endpoints REST
+    pour créer, lister et mettre à jour ces entités.
+  expected_output: >
+    Une description technique détaillée des modèles (champs + types) et des endpoints REST,
+    avec un pseudo-code ou exemple de code Python pour les implémenter.
+  agent: backend_dev_agent
+  context: [define_architecture]
+
+design_mobile_screens:
+  description: >
+    Concevoir la structure des écrans mobiles pour BillBox :
+    - écran liste des factures
+    - écran détail d'une facture avec bouton "Payer"
+    - écran choix de l'app de paiement (TWINT, PostFinance, etc.)
+    - écran "Recevoir un paiement" avec QR pour B2C
+    - écran "Encaisser un paiement" pour B2B
+    Produire une description claire (texte + pseudo-wireframes) et,
+    si possible, un squelette de code React Native.
+  expected_output: >
+    Une liste d'écrans, leurs composants principaux, le
